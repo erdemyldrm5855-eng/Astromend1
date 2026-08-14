@@ -1,0 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --gold: #f5c518;
+  --gold-lt: #ffd966;
+  --purple: #4a3aaa;
+  --deep: #0d1424;
+  --mid: #131e35;
+  --card: rgba(16, 24, 44, 0.75);
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #e4e8f5;
+  --muted: #8896b8;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  background: var(--deep);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, .brand-name { font-family: 'Cinzel', serif; }
+
+/* ── Yıldız/nebula arka planı ── */
+#starCanvas { position: fixed; inset: 0; z-index: 0; }
+.nebula { position: fixed; border-radius: 50%; filter: blur(100px); opacity: .3; pointer-events: none; z-index: 0; }
+.nebula-1 { width: 500px; height: 500px; background: radial-gradient(circle, #1a2a6e, transparent); top: -150px; left: -100px; }
+.nebula-2 { width: 460px; height: 460px; background: radial-gradient(circle, #4a1080, transparent); top: 30%; right: -150px; }
+.nebula-3 { width: 400px; height: 400px; background: radial-gradient(circle, #0d2a6e, transparent); bottom: -100px; left: 20%; }
+
+header, main, footer { position: relative; z-index: 1; }
+
+/* ── Top bar ── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22px 48px; max-width: 1280px; margin: 0 auto;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand svg { width: 24px; height: 24px; }
+.brand-name { font-size: 19px; font-weight: 700; letter-spacing: .12em; }
+.top-nav { display: flex; gap: 32px; }
+.top-nav a { color: var(--muted); text-decoration: none; font-size: 14.5px; font-weight: 500; transition: color .2s; }
+.top-nav a:hover { color: var(--text); }
+.top-actions { display: flex; align-items: center; gap: 12px; }
+
+.btn-ghost, .btn-gold {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 10px 20px; border-radius: 999px; font-size: 14px; font-weight: 600;
+  text-decoration: none; cursor: pointer; transition: transform .2s, box-shadow .2s, filter .2s;
+  border: none;
+}
+.btn-ghost { background: rgba(255,255,255,.06); color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:hover { background: rgba(255,255,255,.12); }
+.btn-gold { background: linear-gradient(135deg, var(--gold-lt), var(--gold)); color: #1a1300; box-shadow: 0 4px 20px rgba(245,197,24,.3); }
+.btn-gold:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(245,197,24,.45); }
+.btn-lg { padding: 14px 30px; font-size: 15px; }
+
+/* ── Hero ── */
+.hero {
+  max-width: 1280px; margin: 0 auto; padding: 60px 48px 40px;
+  display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center;
+}
+.eyebrow {
+  font-size: 12.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold);
+  font-weight: 600; margin-bottom: 16px;
+}
+.hero-text h1 { font-size: 44px; font-weight: 700; line-height: 1.2; margin-bottom: 20px; }
+.hero-sub { font-size: 17px; line-height: 1.6; color: var(--muted); max-width: 520px; margin-bottom: 32px; }
+.hero-cta { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.hero-note { font-size: 13px; color: var(--muted); }
+
+.hero-visual { display: flex; justify-content: center; }
+.constellation-wrap { position: relative; width: 300px; height: 300px; }
+.constellation-wrap svg { width: 100%; height: 100%; animation: rotateSlow 50s linear infinite; }
+@keyframes rotateSlow { to { transform: rotate(360deg); } }
+.planet { position: absolute; border-radius: 50%; box-shadow: 0 0 20px currentColor; }
+.planet-1 { width: 20px; height: 20px; background: #c9a84c; color: #c9a84c; top: 6px; left: 50%; transform: translateX(-50%); animation: orbit1 6s linear infinite; }
+.planet-2 { width: 14px; height: 14px; background: #7b5ea7; color: #7b5ea7; bottom: 24px; right: 20px; animation: orbit2 9s linear infinite; }
+@keyframes orbit1 { 0%,100% { transform: translateX(-50%) scale(1); opacity: 1; } 50% { transform: translateX(-50%) scale(1.3); opacity: .7; } }
+@keyframes orbit2 { 0%,100% { transform: scale(1); opacity: .8; } 50% { transform: scale(1.4); opacity: 1; } }
+
+/* ── Burç şeridi ── */
+.zodiac-strip {
+  display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;
+  max-width: 900px; margin: 0 auto; padding: 20px 24px 60px;
+}
+.z-icon {
+  width: 44px; height: 44px; border: 1px solid var(--border); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  transition: border-color .3s, box-shadow .3s, transform .3s; cursor: default;
+}
+.z-icon:hover { border-color: rgba(245,197,24,.6); box-shadow: 0 0 14px rgba(245,197,24,.35); transform: scale(1.15); }
+
+/* ── Genel bölüm başlığı ── */
+.section-head { text-align: center; max-width: 640px; margin: 0 auto 44px; }
+.section-head h2 { font-size: 30px; font-weight: 600; }
+
+/* ── Özellikler ── */
+.features { max-width: 1200px; margin: 0 auto; padding: 60px 32px; }
+.feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.feature-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 28px 26px;
+  backdrop-filter: blur(14px); transition: transform .2s, border-color .2s;
+}
+.feature-card:hover { transform: translateY(-3px); border-color: rgba(245,197,24,.3); }
+.feature-card .fi { font-size: 30px; margin-bottom: 14px; }
+.feature-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; font-family: 'Inter', sans-serif; }
+.feature-card p { font-size: 14px; line-height: 1.6; color: var(--muted); }
+.feature-card.ai { border-color: rgba(232,160,255,.25); }
+.feature-card.ai h3 { color: #e8a0ff; }
+
+/* ── Nasıl çalışır ── */
+.how { max-width: 1100px; margin: 0 auto; padding: 40px 32px 80px; }
+.how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+.how-step { text-align: center; padding: 0 12px; }
+.how-num {
+  width: 44px; height: 44px; border-radius: 50%; margin: 0 auto 18px;
+  background: linear-gradient(135deg, var(--gold-lt), var(--gold)); color: #1a1300;
+  display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-weight: 700; font-size: 18px;
+}
+.how-step h3 { font-size: 16.5px; font-weight: 600; margin-bottom: 8px; font-family: 'Inter', sans-serif; }
+.how-step p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+/* ── Son CTA ── */
+.cta-final {
+  max-width: 720px; margin: 0 auto 80px; padding: 56px 40px; text-align: center;
+  background: linear-gradient(160deg, rgba(74,58,170,.25), rgba(13,20,36,.4));
+  border: 1px solid var(--border); border-radius: 24px;
+}
+.cta-final h2 { font-size: 26px; font-weight: 600; margin-bottom: 10px; font-style: italic; }
+.cta-final p { color: var(--muted); margin-bottom: 26px; }
+
+/* ── Footer ── */
+.site-foot {
+  max-width: 1280px; margin: 0 auto; padding: 32px 48px 48px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+  border-top: 1px solid var(--border);
+}
+.foot-links { display: flex; gap: 22px; }
+.foot-links a { color: var(--muted); text-decoration: none; font-size: 13.5px; }
+.foot-links a:hover { color: var(--text); }
+.foot-copy { color: var(--muted); font-size: 12.5px; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; text-align: center; }
+  .hero-sub { margin-left: auto; margin-right: auto; }
+  .hero-cta { justify-content: center; }
+  .hero-visual { order: -1; }
+  .feature-grid, .how-grid { grid-template-columns: 1fr; }
+  .top-nav { display: none; }
+}
+@media (max-width: 560px) {
+  .topbar { padding: 18px 20px; }
+  .hero { padding: 40px 20px 24px; }
+  .hero-text h1 { font-size: 32px; }
+  .features, .how { padding: 40px 20px; }
+  .site-foot { padding: 24px 20px 36px; flex-direction: column; text-align: center; }
+}

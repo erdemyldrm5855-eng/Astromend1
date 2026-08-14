@@ -707,7 +707,31 @@ app.use('/css', express.static(path.join(__dirname, 'css')));
 app.use('/js', express.static(path.join(__dirname, 'js')));
 
 app.get('/', (req, res) => {
-  res.redirect(req.user ? '/html/home.html' : '/html/log.html');
+  res.redirect(req.user ? '/html/home.html' : '/html/landing.html');
+});
+
+// ── SEO: robots.txt ve sitemap.xml (arama motorları için) ──
+app.get('/robots.txt', (req, res) => {
+  const base = `${req.protocol}://${req.get('host')}`;
+  res.type('text/plain').send(
+    `User-agent: *\n` +
+    `Allow: /$\n` +
+    `Allow: /html/landing.html\n` +
+    `Disallow: /html/home.html\n` +
+    `Disallow: /html/log.html\n` +
+    `Disallow: /api/\n` +
+    `Sitemap: ${base}/sitemap.xml\n`
+  );
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  const base = `${req.protocol}://${req.get('host')}`;
+  res.type('application/xml').send(
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    `  <url><loc>${base}/</loc></url>\n` +
+    `</urlset>\n`
+  );
 });
 
 // ── Beklenmeyen hatalar için JSON yanıt ──

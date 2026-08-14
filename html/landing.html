@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Astromend — Yıldızların Rehberliğinde Kişisel Astroloji</title>
+<meta name="description" content="Astromend; doğum haritanı, günlük burç yorumunu, bugünün gökyüzünü, ilişki uyumunu (sinastri) ve astroloji topluluğunu tek yerde sunar. Ücretsiz kayıt ol, yıldızlarla bağlantı kur.">
+<meta property="og:title" content="Astromend — Yıldızların Rehberliğinde">
+<meta property="og:description" content="Doğum haritan, günlük burç yorumun, bugünün gökyüzü, sinastri ve astroloji topluluğu tek yerde.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/landing.css">
+</head>
+<body>
+
+<canvas id="starCanvas"></canvas>
+<div class="nebula nebula-1"></div>
+<div class="nebula nebula-2"></div>
+<div class="nebula nebula-3"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#f5c518" stroke-width="1.4"><path d="M12 2l1.8 8.2L22 12l-8.2 1.8L12 22l-1.8-8.2L2 12l8.2-1.8L12 2z"/></svg>
+    <span class="brand-name">ASTROMEND</span>
+  </div>
+  <nav class="top-nav">
+    <a href="#ozellikler">Özellikler</a>
+    <a href="#nasil-calisir">Nasıl Çalışır</a>
+  </nav>
+  <div class="top-actions">
+    <a class="btn-ghost" href="log.html">Giriş Yap</a>
+    <a class="btn-gold" href="log.html">Ücretsiz Başla</a>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">✦ Kişisel Astroloji Platformu</div>
+      <h1>Yıldızların Rehberliğinde,<br>Kendi Yolunu Çiz.</h1>
+      <p class="hero-sub">Doğum haritan, günlük burç yorumun, bugünün gökyüzü, ilişki uyumun ve astroloji topluluğu — hepsi tek bir yerde, sana özel.</p>
+      <div class="hero-cta">
+        <a class="btn-gold btn-lg" href="log.html">Ücretsiz Kayıt Ol</a>
+        <a class="btn-ghost btn-lg" href="log.html">Zaten Üyeyim</a>
+      </div>
+      <div class="hero-note">Kredi kartı gerekmez · Saniyeler içinde başla</div>
+    </div>
+    <div class="hero-visual">
+      <div class="constellation-wrap">
+        <svg viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="130" cy="130" r="120" stroke="rgba(201,168,76,0.12)" stroke-width="1"/>
+          <circle cx="130" cy="130" r="90"  stroke="rgba(201,168,76,0.08)" stroke-width="1" stroke-dasharray="4 8"/>
+          <line x1="130" y1="10"  x2="200" y2="60"  stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+          <line x1="200" y1="60"  x2="230" y2="140" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+          <line x1="230" y1="140" x2="180" y2="220" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+          <line x1="180" y1="220" x2="80"  y2="220" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+          <line x1="80"  y1="220" x2="30"  y2="140" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+          <line x1="30"  y1="140" x2="60"  y2="60"  stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+          <line x1="60"  y1="60"  x2="130" y2="10"  stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+          <circle cx="130" cy="10"  r="4" fill="#f0d080" opacity=".9"/>
+          <circle cx="200" cy="60"  r="3" fill="#c9a84c" opacity=".8"/>
+          <circle cx="230" cy="140" r="4" fill="#f0d080" opacity=".9"/>
+          <circle cx="180" cy="220" r="3" fill="#c9a84c" opacity=".8"/>
+          <circle cx="80"  cy="220" r="3.5" fill="#e8a0ff" opacity=".85"/>
+          <circle cx="30"  cy="140" r="4" fill="#f0d080" opacity=".9"/>
+          <circle cx="60"  cy="60"  r="3" fill="#c9a84c" opacity=".8"/>
+          <circle cx="130" cy="130" r="6" fill="#c9a84c" opacity=".95"/>
+          <text x="130" y="136" text-anchor="middle" fill="rgba(201,168,76,0.7)" font-size="10" font-family="serif">✦</text>
+        </svg>
+        <div class="planet planet-1"></div>
+        <div class="planet planet-2"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BURÇLAR ŞERİDİ -->
+  <section class="zodiac-strip">
+    <div class="z-icon" title="Koç">♈</div>
+    <div class="z-icon" title="Boğa">♉</div>
+    <div class="z-icon" title="İkizler">♊</div>
+    <div class="z-icon" title="Yengeç">♋</div>
+    <div class="z-icon" title="Aslan">♌</div>
+    <div class="z-icon" title="Başak">♍</div>
+    <div class="z-icon" title="Terazi">♎</div>
+    <div class="z-icon" title="Akrep">♏</div>
+    <div class="z-icon" title="Yay">♐</div>
+    <div class="z-icon" title="Oğlak">♑</div>
+    <div class="z-icon" title="Kova">♒</div>
+    <div class="z-icon" title="Balık">♓</div>
+  </section>
+
+  <!-- ÖZELLİKLER -->
+  <section class="features" id="ozellikler">
+    <div class="section-head">
+      <div class="eyebrow">Neler Sunuyoruz?</div>
+      <h2>Astroloji hayatının her anında yanında</h2>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="fi">🗺</div>
+        <h3>Doğum Haritası</h3>
+        <p>Güneş, Ay ve Yükselen burcunu gerçek astronomik hesaplamalarla öğren, kişiye özel yorumlarla keşfet.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fi">🌙</div>
+        <h3>Bugünün Gökyüzü</h3>
+        <p>Güneş, Ay, Ay evresi ve gezegenlerin o günkü konumları — her gün güncel, sana özel yorumlanmış.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fi">💑</div>
+        <h3>Sinastri — İlişki Uyumu</h3>
+        <p>Astromend'deki bir arkadaşınla ya da doğum tarihini bildiğin biriyle burç uyumunu saniyeler içinde hesapla.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fi">☀</div>
+        <h3>Solar Return</h3>
+        <p>Kişisel güneş yılının başlangıcına ne kadar kaldığını takip et.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fi">📱</div>
+        <h3>Sosyal Akış</h3>
+        <p>Düşüncelerini, hikâyelerini paylaş; topluluktaki diğer kullanıcıları burçlarına göre keşfet.</p>
+      </div>
+      <div class="feature-card ai">
+        <div class="fi">✨</div>
+        <h3>AI Asistan</h3>
+        <p>Burcuna göre kişiselleştirilmiş yanıtlar veren asistanına aşk, kariyer, gelecek hakkında soru sor.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- NASIL ÇALIŞIR -->
+  <section class="how" id="nasil-calisir">
+    <div class="section-head">
+      <div class="eyebrow">Nasıl Çalışır</div>
+      <h2>Üç adımda başla</h2>
+    </div>
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="how-num">1</div>
+        <h3>Ücretsiz kayıt ol</h3>
+        <p>Adın, e-postan ve doğum tarihinle saniyeler içinde hesabını oluştur.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">2</div>
+        <h3>Doğum haritanı gör</h3>
+        <p>Güneş, Ay ve Yükselen burcunu keşfet; istersen doğum saatini ekleyip daha ayrıntılı bir harita al.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">3</div>
+        <h3>Yıldızlarla bağlantı kur</h3>
+        <p>Günlük yorumlarını takip et, sinastri hesapla, topluluğa katıl.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-final">
+    <h2>Yıldız bahanedir, yol senindir.</h2>
+    <p>Astromend'e bugün katıl, kişisel astroloji yolculuğuna başla.</p>
+    <a class="btn-gold btn-lg" href="log.html">Ücretsiz Kayıt Ol</a>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="brand">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#f5c518" stroke-width="1.4"><path d="M12 2l1.8 8.2L22 12l-8.2 1.8L12 22l-1.8-8.2L2 12l8.2-1.8L12 2z"/></svg>
+    <span class="brand-name">ASTROMEND</span>
+  </div>
+  <div class="foot-links">
+    <a href="#">Hakkımızda</a>
+    <a href="#">Gizlilik</a>
+    <a href="#">Şartlar</a>
+    <a href="#">İletişim</a>
+  </div>
+  <div class="foot-copy">© 2026 Astromend</div>
+</footer>
+
+<script src="../js/landing.js"></script>
+</body>
+</html>
