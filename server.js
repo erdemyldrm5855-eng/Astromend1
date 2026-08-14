@@ -279,13 +279,21 @@ app.get('/api/transit', requireAuth, async (req, res) => {
   const natal = user && user.birthDate ? astro.getNatalChart(user.birthDate, user.birthTime) : null;
   const transit = astro.getTransit();
   const moonPhase = astro.getMoonPhase();
+  const planets = astro.getPlanetPositions();
   res.json({
     ok: true,
     transit,
     moonPhase,
-    planets: astro.getPlanetPositions(),
+    planets,
     natal,
-    todayNote: natal ? astro.describeDayMood(transit.moon.name, natal.sun.name) : null,
+    todayNote: natal ? astro.describeDayMood({
+      moonSign: transit.moon.name,
+      natalSun: natal.sun.name,
+      moonPhase: moonPhase.name,
+      retrogradePlanets: planets.filter(p => p.retrograde).map(p => p.name),
+      seed: user.id,
+      dateStr: new Date().toISOString().slice(0, 10)
+    }) : null,
     interpretations: {
       sun: astro.SIGN_INTERPRETATIONS[transit.sun.name],
       moon: astro.SIGN_INTERPRETATIONS[transit.moon.name]
@@ -379,7 +387,14 @@ app.get('/api/chart-history', requireAuth, async (req, res) => {
     sun: day.sun,
     moon: day.moon,
     moonPhase: day.moonPhase,
-    note: astro.describeDayMood(day.moon.name, mySign.name)
+    note: astro.describeDayMood({
+      moonSign: day.moon.name,
+      natalSun: mySign.name,
+      moonPhase: day.moonPhase.name,
+      retrogradePlanets: astro.getPlanetPositions(new Date(`${day.date}T12:00:00Z`)).filter(p => p.retrograde).map(p => p.name),
+      seed: user.id,
+      dateStr: day.date
+    })
   }));
 
   res.json({ ok: true, mySign, history });
