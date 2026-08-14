@@ -38,9 +38,14 @@ async function loadStories() {
 function openStoryComposeModal() {
   openModal(`
     <h3>✦ Hikaye Paylaş</h3>
-    <label>Fotoğraf <span class="field-hint">(opsiyonel, maks. ~3MB)</span>
-      <input type="file" id="storyImageInput" accept="image/png,image/jpeg,image/gif,image/webp">
-    </label>
+    <div class="story-photo-field">
+      <span class="field-label-text">Fotoğraf <span class="field-hint">(opsiyonel, maks. ~3MB)</span></span>
+      <label class="story-photo-btn" id="storyPhotoBtn">
+        <span class="story-photo-icon">📷</span>
+        <span id="storyPhotoBtnText">Fotoğraf seç</span>
+        <input type="file" id="storyImageInput" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
+      </label>
+    </div>
     <div id="storyImagePreview"></div>
     <label>Not <span class="field-hint">(opsiyonel)</span>
       <textarea id="storyText" maxlength="200" rows="3" placeholder="Bugün gökyüzü..."></textarea>
@@ -51,24 +56,34 @@ function openStoryComposeModal() {
 
   let imageDataUrl = null;
   const fileInput = document.getElementById('storyImageInput');
+  const photoBtnText = document.getElementById('storyPhotoBtnText');
   const preview = document.getElementById('storyImagePreview');
   const msgEl = document.getElementById('storyModalMsg');
 
+  function resetPhoto() {
+    imageDataUrl = null;
+    fileInput.value = '';
+    preview.innerHTML = '';
+    photoBtnText.textContent = 'Fotoğraf seç';
+  }
+
   fileInput.addEventListener('change', () => {
     const file = fileInput.files[0];
-    preview.innerHTML = '';
-    imageDataUrl = null;
     msgEl.innerHTML = '';
-    if (!file) return;
+    if (!file) { resetPhoto(); return; }
     if (file.size > 3.5 * 1024 * 1024) {
       msgEl.innerHTML = '<p class="modal-error">Fotoğraf çok büyük, en fazla ~3MB olmalı.</p>';
-      fileInput.value = '';
+      resetPhoto();
       return;
     }
     const reader = new FileReader();
     reader.onload = () => {
       imageDataUrl = reader.result;
-      preview.innerHTML = `<img src="${imageDataUrl}" class="story-preview-img">`;
+      photoBtnText.textContent = 'Fotoğrafı değiştir';
+      preview.innerHTML = `
+        <img src="${imageDataUrl}" class="story-preview-img">
+        <button type="button" class="remove-image-btn" id="removeStoryImage">✕</button>`;
+      document.getElementById('removeStoryImage').addEventListener('click', resetPhoto);
     };
     reader.readAsDataURL(file);
   });
