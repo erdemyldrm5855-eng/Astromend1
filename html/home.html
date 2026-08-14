@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Astromend — Bugün Yıldızlar Seninle</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/home.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="hamburger-btn" id="hamburgerBtn" title="Menü">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="brand">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#C9973F" stroke-width="1.4"><path d="M12 2l1.8 8.2L22 12l-8.2 1.8L12 22l-1.8-8.2L2 12l8.2-1.8L12 2z"/></svg>
+    <span class="brand-name">ASTROMEND</span>
+  </div>
+  <nav class="top-nav">
+    <a class="nav-link active" data-view="feed" href="#">Ana Sayfa</a>
+    <a class="nav-link" data-view="chart" href="#">Haritalar</a>
+    <a class="nav-link" data-view="assistant" href="#">AI Asistan</a>
+    <a class="nav-link" data-view="community" href="#">Topluluk</a>
+  </nav>
+  <div class="top-actions">
+    <div class="notif-wrap">
+      <div class="icon-btn" id="notifBtn" title="Bildirimler">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span class="dot" id="notifDot" hidden></span>
+      </div>
+      <div class="notif-dropdown" id="notifDropdown" hidden>
+        <div class="notif-head">Bildirimler</div>
+        <div id="notifList"><p class="empty-note">Yükleniyor…</p></div>
+      </div>
+    </div>
+    <div class="icon-btn" id="logoutBtn" title="Çıkış Yap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></div>
+    <div class="avatar-sm nav-link" id="topbarAvatar" data-view="profile" title="Profilim" style="cursor:pointer"><span>?</span></div>
+  </div>
+</div>
+
+<!-- Mobil hamburger menü -->
+<div class="mobile-menu-overlay" id="mobileMenuOverlay" hidden></div>
+<nav class="mobile-menu" id="mobileMenu" hidden>
+  <div class="mobile-menu-section">
+    <div class="mobile-menu-label">Menü</div>
+    <a class="mobile-menu-link nav-link active" data-view="feed" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span>Ana Sayfa</span></a>
+    <a class="mobile-menu-link nav-link" data-view="chart" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(-20 12 12)"/></svg><span>Haritalar</span></a>
+    <a class="mobile-menu-link nav-link" data-view="assistant" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/><path d="M19 15l.7 2.1L22 18l-2.3.9L19 21l-.7-2.1L16 18l2.3-.9L19 15z"/></svg><span>AI Asistan</span></a>
+    <a class="mobile-menu-link nav-link" data-view="community" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9" r="2.4"/><path d="M2.5 20v-1.2A4.8 4.8 0 0 1 7.3 14h1.4a4.8 4.8 0 0 1 4.8 4.8V20"/><path d="M14.8 14.4a4 4 0 0 1 4.7 3.9V20"/></svg><span>Topluluk</span></a>
+    <a class="mobile-menu-link nav-link" data-view="profile" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="4"/><circle cx="17" cy="9" r="3"/><path d="M2 21v-2a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v2"/><path d="M15 14a4 4 0 0 1 4 4v3"/></svg><span>Profil</span></a>
+  </div>
+  <div class="mobile-menu-section">
+    <div class="mobile-menu-label">Kısayollar</div>
+    <a class="mobile-menu-link nav-link" data-view="synastry" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-4.35-9.5-8.5C.7 8.9 2.4 5 6 5c2 0 3.3 1.1 4 2.2C10.7 6.1 12 5 14 5c3.6 0 5.3 3.9 3.5 7.5C19 16.65 12 21 12 21z"/></svg><span>Sinastri</span></a>
+    <a class="mobile-menu-link" href="#" data-action="solar-return"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4.5"/><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6"/></svg><span>Solar Return</span></a>
+    <a class="mobile-menu-link" href="#" data-action="all-charts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg><span>Tüm Haritalar</span></a>
+  </div>
+  <button class="mobile-menu-logout" id="mobileLogoutBtn">Çıkış Yap</button>
+</nav>
+
+<div class="layout">
+
+  <!-- LEFT RAIL -->
+  <aside class="rail">
+    <div class="rail-section">
+      <div class="rail-label">Menü</div>
+      <a class="rail-link nav-link active" data-view="feed" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span>Ana Sayfa</span></a>
+      <a class="rail-link nav-link" data-view="chart" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(-20 12 12)"/></svg><span>Haritalar</span></a>
+      <a class="rail-link nav-link" data-view="assistant" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/><path d="M19 15l.7 2.1L22 18l-2.3.9L19 21l-.7-2.1L16 18l2.3-.9L19 15z"/></svg><span>AI Asistan</span></a>
+      <a class="rail-link nav-link" data-view="community" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9" r="2.4"/><path d="M2.5 20v-1.2A4.8 4.8 0 0 1 7.3 14h1.4a4.8 4.8 0 0 1 4.8 4.8V20"/><path d="M14.8 14.4a4 4 0 0 1 4.7 3.9V20"/></svg><span>Topluluk</span></a>
+      <a class="rail-link nav-link" data-view="profile" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="4"/><circle cx="17" cy="9" r="3"/><path d="M2 21v-2a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v2"/><path d="M15 14a4 4 0 0 1 4 4v3"/></svg><span>Profil</span></a>
+    </div>
+    <div class="rail-section">
+      <div class="rail-label">Kısayollar</div>
+      <a class="rail-link nav-link" data-view="synastry" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-4.35-9.5-8.5C.7 8.9 2.4 5 6 5c2 0 3.3 1.1 4 2.2C10.7 6.1 12 5 14 5c3.6 0 5.3 3.9 3.5 7.5C19 16.65 12 21 12 21z"/></svg><span>Sinastri</span></a>
+      <a class="rail-link" href="#" data-action="solar-return"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4.5"/><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6"/></svg><span>Solar Return</span></a>
+      <a class="rail-link" href="#" data-action="all-charts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg><span>Tüm Haritalar</span></a>
+    </div>
+    <div class="rail-cta">
+      <strong>Astromend Pro</strong>
+      <p>Sınırsız AI yorumu, detaylı transit raporları ve reklamsız akış.</p>
+      <button>Yükselt</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ══ ANA SAYFA (Akış) ══ -->
+    <div class="view" id="view-feed">
+      <div class="greet-row">
+        <div>
+          <h1 id="greetName">Merhaba 👋</h1>
+          <p class="sub" id="greetSub">Bugün yıldızlar seninle.</p>
+        </div>
+        <div class="date-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+          <span id="todayPill">—</span>
+        </div>
+      </div>
+
+      <div class="sky-card">
+        <div class="sky-head">
+          <h3>Bugünün Gökyüzü</h3>
+          <a href="#" class="nav-link" data-view="today-sky">Detaylar →</a>
+        </div>
+        <div class="sky-grid">
+          <div class="sky-item">
+            <div class="sky-icon sun"><svg viewBox="0 0 24 24" fill="none" stroke="#C9973F" stroke-width="1.8"><circle cx="12" cy="12" r="4.5"/><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6"/></svg></div>
+            <div><div class="sky-label">Güneş Burcun</div><div class="sky-val" id="sunSignVal">—</div></div>
+          </div>
+          <div class="sky-item">
+            <div class="sky-icon moon"><svg viewBox="0 0 24 24" fill="none" stroke="#8B7FD6" stroke-width="1.8"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg></div>
+            <div><div class="sky-label">Bugün Ay</div><div class="sky-val" id="moonTransitVal">—</div></div>
+          </div>
+          <div class="sky-item">
+            <div class="sky-icon retro"><svg viewBox="0 0 24 24" fill="none" stroke="#7B7F94" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><ellipse cx="12" cy="12" rx="9.5" ry="3.6" transform="rotate(-20 12 12)"/></svg></div>
+            <div><div class="sky-label">Bugün Güneş</div><div class="sky-val" id="sunTransitVal">—</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-card">
+        <div class="quick-head">
+          <h3>Hızlı Hesapla</h3>
+          <a href="#" data-action="all-charts">Tümü →</a>
+        </div>
+        <div class="quick-grid">
+          <div class="quick-tile" data-action="natal">
+            <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></svg></div>
+            <div class="qt">Natal</div><div class="qs">Doğum Haritası</div>
+          </div>
+          <div class="quick-tile" data-action="transit">
+            <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4"/><ellipse cx="12" cy="12" rx="9.5" ry="3.6" transform="rotate(-20 12 12)"/></svg></div>
+            <div class="qt">Transit</div><div class="qs">Transit Harita</div>
+          </div>
+          <div class="quick-tile nav-link" data-view="synastry">
+            <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s-7-4.35-9.5-8.5C.7 8.9 2.4 5 6 5c2 0 3.3 1.1 4 2.2C10.7 6.1 12 5 14 5c3.6 0 5.3 3.9 3.5 7.5C19 16.65 12 21 12 21z"/></svg></div>
+            <div class="qt">Sinastri</div><div class="qs">İlişki Uyumu</div>
+          </div>
+          <div class="quick-tile" data-action="solar-return">
+            <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4.5"/><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6"/></svg></div>
+            <div class="qt">Solar Return</div><div class="qs">Güneş Dönüşü</div>
+          </div>
+          <div class="quick-tile" data-action="all-charts">
+            <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></div>
+            <div class="qt">Tümü</div><div class="qs">Tüm Haritalar</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="compose-card">
+        <textarea id="composeText" maxlength="500" placeholder="Yıldızlarla ilgili ne düşünüyorsun? ✦"></textarea>
+        <div id="composeImagePreview"></div>
+        <div class="compose-foot">
+          <label class="compose-photo-btn" title="Fotoğraf ekle">
+            📷
+            <input type="file" id="composeImageInput" accept="image/*" capture="environment" hidden>
+          </label>
+          <span id="composeCount" class="compose-count">0/500</span>
+          <button id="composeBtn">Paylaş</button>
+        </div>
+      </div>
+
+      <div class="feed-tabs">
+        <span class="active">Akış</span>
+      </div>
+
+      <div id="postsContainer"></div>
+    </div>
+
+    <!-- ══ BUGÜNÜN GÖKYÜZÜ (o günün transiti + yorum) ══ -->
+    <div class="view" id="view-today-sky" hidden>
+      <h2 class="view-title" id="todaySkyTitle">Bugünün Gökyüzü</h2>
+      <p class="view-desc">Şu an gökyüzünde neler oluyor — Güneş, Ay ve Ay evresi, gerçek astronomik konumlara göre.</p>
+      <div id="todaySkyBody" class="chart-grid"><p class="empty-note">Yükleniyor…</p></div>
+    </div>
+
+    <!-- ══ HARİTALAR ══ -->
+    <div class="view" id="view-chart" hidden>
+      <div class="view-head">
+        <h2 class="view-title">Yıldız Haritan</h2>
+        <span class="approx-badge">yaklaşık hesaplama</span>
+      </div>
+      <p class="view-desc">Güneş &amp; Ay konumları gerçek astronomik formüllerle, yükselen burç ise doğum saatine dayalı basitleştirilmiş bir tahminle hesaplanır.</p>
+
+      <h3 class="chart-section-title">Doğum Haritan (Natal)</h3>
+      <div id="natalCards" class="chart-grid"><p class="empty-note">Yükleniyor…</p></div>
+
+      <h3 class="chart-section-title" id="transitHeading">Bugünün Transiti</h3>
+      <div id="transitCards" class="chart-grid"><p class="empty-note">Yükleniyor…</p></div>
+    </div>
+
+    <!-- ══ TÜM HARİTALAR (12 burcun genel özellikleri) ══ -->
+    <div class="view" id="view-all-charts" hidden>
+      <h2 class="view-title">Tüm Haritalar</h2>
+      <p class="view-desc">12 burcun Güneş, Ay ve Yükselen konumundaki genel özellikleri.</p>
+      <div id="allChartsBody" class="chart-grid"><p class="empty-note">Yükleniyor…</p></div>
+
+      <h3 class="chart-section-title" style="margin-top:32px;">Geçmiş Haritalarım</h3>
+      <p class="view-desc">Son 7 gündeki gökyüzü değişimleri, senin Güneş burcuna göre yorumlanmış.</p>
+      <div id="chartHistoryBody" class="chart-grid"><p class="empty-note">Yükleniyor…</p></div>
+    </div>
+
+    <!-- ══ SOLAR RETURN (kişisel panel) ══ -->
+    <div class="view" id="view-solar-return" hidden>
+      <h2 class="view-title">Güneş Dönüşün (Solar Return)</h2>
+      <p class="view-desc">Güneşin, doğduğun günkü konumuna her yıl geri döndüğü an — kişisel yeni yılın başlangıcı sayılır.</p>
+      <div id="solarReturnBody"><p class="empty-note">Yükleniyor…</p></div>
+    </div>
+
+    <!-- ══ SİNASTRİ (kendi bölümü) ══ -->
+    <div class="view" id="view-synastry" hidden>
+      <h2 class="view-title">Sinastri — İlişki Uyumu</h2>
+      <p class="view-desc">Partnerinin Astromend kullanıcı adını yaz, ya da kayıtlı değilse doğum tarihini gir.</p>
+
+      <div class="synastry-form">
+        <label>Partnerin kullanıcı adı
+          <div class="autocomplete-wrap">
+            <input type="text" id="synName" placeholder="İsim yaz..." autocomplete="off">
+            <div class="autocomplete-list" id="synAutocomplete" hidden></div>
+          </div>
+        </label>
+        <div class="modal-or">veya</div>
+        <label>Partnerin doğum tarihi <span class="field-hint">(kayıtlı değilse)</span>
+          <input type="date" id="synDate">
+        </label>
+        <button class="submit-btn" id="synSubmit">Hesapla</button>
+        <div id="synResult"></div>
+      </div>
+
+      <h3 class="chart-section-title" style="margin-top:32px;">Sinastri Geçmişi</h3>
+      <div id="synastryHistoryBody" class="chart-grid"><p class="empty-note">Yükleniyor…</p></div>
+    </div>
+
+    <!-- ══ AI ASİSTAN ══ -->
+    <div class="view" id="view-assistant" hidden>
+      <h2 class="view-title">AI Asistan</h2>
+      <p class="view-desc">Kural tabanlı basit bir asistan — gerçek zamanlı bir yapay zeka modeli değildir, burcuna göre hazır yorumlar sunar.</p>
+      <div class="assistant-panel">
+        <div id="chatLog" class="chat-log"></div>
+        <form id="chatForm" class="chat-form">
+          <input id="chatInput" type="text" placeholder="Bir şey sor... (örn: bugün nasıl geçer, aşk hayatım nasıl)" autocomplete="off" />
+          <button type="submit">Gönder</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ══ TOPLULUK ══ -->
+    <div class="view" id="view-community" hidden>
+      <h2 class="view-title">Topluluk</h2>
+      <p class="view-desc">Astromend'e kayıtlı diğer kullanıcılar.</p>
+      <input type="text" id="communitySearch" class="community-search" placeholder="İsim ya da burca göre ara...">
+      <div id="communityList" class="community-grid"><p class="empty-note">Yükleniyor…</p></div>
+    </div>
+
+    <!-- ══ PROFİL ══ -->
+    <div class="view" id="view-profile" hidden>
+      <h2 class="view-title">Profilim</h2>
+      <p class="view-desc">Bilgilerin sadece burç/harita hesaplamaları için kullanılır.</p>
+
+      <div class="profile-header">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar" id="profileAvatarPreview"><span>?</span></div>
+          <label class="profile-avatar-edit" title="Fotoğraf değiştir">
+            📷
+            <input type="file" id="profileAvatarInput" accept="image/*" hidden>
+          </label>
+        </div>
+        <div class="profile-header-info">
+          <div class="profile-header-name" id="profileHeaderName">—</div>
+          <div class="profile-header-sign" id="profileHeaderSign"></div>
+          <div class="profile-header-since" id="profileHeaderSince"></div>
+          <button type="button" class="remove-avatar-btn" id="removeAvatarBtn" hidden>Fotoğrafı Kaldır</button>
+        </div>
+      </div>
+
+      <div class="profile-stats">
+        <div class="profile-stat"><div class="profile-stat-num" id="statPostCount">0</div><div class="profile-stat-label">Gönderi</div></div>
+        <div class="profile-stat"><div class="profile-stat-num" id="statLikeCount">0</div><div class="profile-stat-label">Alınan Beğeni</div></div>
+      </div>
+
+      <form id="profileForm" class="profile-form">
+        <label>Ad Soyad
+          <input type="text" id="pf-name" required>
+        </label>
+        <label>Doğum Tarihi
+          <input type="date" id="pf-birthDate" required>
+        </label>
+        <label>Doğum Saati <span class="field-hint">(opsiyonel — yükselen burç için)</span>
+          <input type="time" id="pf-birthTime">
+        </label>
+        <label>Doğum Yeri <span class="field-hint">(opsiyonel)</span>
+          <input type="text" id="pf-birthPlace" placeholder="İstanbul, Türkiye">
+        </label>
+        <label>Hakkında <span class="field-hint">(opsiyonel)</span>
+          <textarea id="pf-bio" maxlength="280" placeholder="Kendinden bahset..."></textarea>
+        </label>
+        <button type="submit">Kaydet</button>
+        <p id="profileMsg" class="profile-msg"></p>
+      </form>
+
+      <h3 class="chart-section-title" style="margin-top:32px;">Gönderilerim</h3>
+      <div id="myPostsContainer"><p class="empty-note">Yükleniyor…</p></div>
+    </div>
+
+  </main>
+
+  <!-- RIGHT RAIL -->
+  <aside class="rrail">
+    <div class="stories" id="storiesContainer">
+      <p class="empty-note">Yükleniyor…</p>
+    </div>
+
+    <div class="ai-card">
+      <div class="ai-head">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/></svg>
+        <h3>AI'nin Yorumu</h3>
+      </div>
+      <p id="aiComment">Bugün duygusal derinliğin artıyor. İç dünyana zaman ayırmak ve sezgilerine güvenmek sana iyi gelecek.</p>
+      <button class="nav-link" data-view="assistant">Devamını Oku →</button>
+    </div>
+
+    <div class="poll-card">
+      <div class="poll-head">
+        <div class="poll-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#161A2E" stroke-width="1.7"><path d="M4 20V10M12 20V4M20 20v-7"/></svg></div>
+        <h4>Günün Anketi</h4>
+      </div>
+      <div class="poll-q" id="pollQuestion">Yükleniyor…</div>
+      <div class="poll-meta" id="pollMeta"></div>
+      <div id="pollOptions"></div>
+    </div>
+
+    <div class="side-foot">
+      <a href="#">Hakkımızda</a><a href="#">Gizlilik</a><a href="#">Şartlar</a>
+      © 2026 Astromend
+    </div>
+  </aside>
+
+</div>
+
+<!-- ── Modal (Sinastri vb. için) ── -->
+<div class="modal-overlay" id="modalOverlay" hidden>
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- home-core.js ilk yüklenmeli — diğerleri buna bağımlı -->
+<script src="../js/home-core.js"></script>
+<script src="../js/home-menu.js"></script>
+<script src="../js/home-feed.js"></script>
+<script src="../js/home-charts.js"></script>
+<script src="../js/home-assistant.js"></script>
+<script src="../js/home-community.js"></script>
+<script src="../js/home-stories.js"></script>
+<script src="../js/home-profile.js"></script>
+<script src="../js/home-synastry.js"></script>
+<script src="../js/home-notifications.js"></script>
+<script src="../js/home-poll.js"></script>
+<!-- home-init.js en son yüklenmeli — sayfa açılışında yukarıdaki fonksiyonları çağırır -->
+<script src="../js/home-init.js"></script>
+</body>
+</html>

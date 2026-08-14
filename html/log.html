@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Astromend — Giriş Yap</title>
+<link rel="stylesheet" href="../css/log.css">
+</head>
+<body>
+
+<canvas id="starCanvas"></canvas>
+
+<div class="nebula nebula-1"></div>
+<div class="nebula nebula-2"></div>
+<div class="nebula nebula-3"></div>
+
+<div class="page">
+
+  <!-- ── Left panel ── -->
+  <div class="panel-left">
+    <div class="constellation-wrap">
+      <svg viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- outer ring -->
+        <circle cx="130" cy="130" r="120" stroke="rgba(201,168,76,0.12)" stroke-width="1"/>
+        <circle cx="130" cy="130" r="90"  stroke="rgba(201,168,76,0.08)" stroke-width="1" stroke-dasharray="4 8"/>
+        <!-- constellation lines -->
+        <line x1="130" y1="10"  x2="200" y2="60"  stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+        <line x1="200" y1="60"  x2="230" y2="140" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+        <line x1="230" y1="140" x2="180" y2="220" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+        <line x1="180" y1="220" x2="80"  y2="220" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+        <line x1="80"  y1="220" x2="30"  y2="140" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+        <line x1="30"  y1="140" x2="60"  y2="60"  stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+        <line x1="60"  y1="60"  x2="130" y2="10"  stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+        <line x1="130" y1="10"  x2="130" y2="130" stroke="rgba(201,168,76,0.15)" stroke-width="1" stroke-dasharray="3 5"/>
+        <line x1="200" y1="60"  x2="130" y2="130" stroke="rgba(201,168,76,0.15)" stroke-width="1" stroke-dasharray="3 5"/>
+        <line x1="230" y1="140" x2="130" y2="130" stroke="rgba(201,168,76,0.15)" stroke-width="1" stroke-dasharray="3 5"/>
+        <line x1="30"  y1="140" x2="130" y2="130" stroke="rgba(201,168,76,0.15)" stroke-width="1" stroke-dasharray="3 5"/>
+        <!-- star nodes -->
+        <circle cx="130" cy="10"  r="4" fill="#f0d080" opacity=".9" filter="url(#glow)"/>
+        <circle cx="200" cy="60"  r="3" fill="#c9a84c" opacity=".8"/>
+        <circle cx="230" cy="140" r="4" fill="#f0d080" opacity=".9"/>
+        <circle cx="180" cy="220" r="3" fill="#c9a84c" opacity=".8"/>
+        <circle cx="80"  cy="220" r="3.5" fill="#e8a0ff" opacity=".85"/>
+        <circle cx="30"  cy="140" r="4" fill="#f0d080" opacity=".9"/>
+        <circle cx="60"  cy="60"  r="3" fill="#c9a84c" opacity=".8"/>
+        <circle cx="130" cy="130" r="6" fill="#c9a84c" opacity=".95"/>
+        <!-- center symbol -->
+        <text x="130" y="136" text-anchor="middle" fill="rgba(201,168,76,0.7)" font-size="10" font-family="serif">✦</text>
+        <defs>
+          <filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+      </svg>
+      <div class="planet planet-1"></div>
+      <div class="planet planet-2"></div>
+    </div>
+
+    <div class="brand-title">Astromend</div>
+    <div class="brand-tagline">Yıldızların Rehberliğinde</div>
+
+    <div class="zodiac-strip">
+      <div class="z-icon" title="Koç">♈</div>
+      <div class="z-icon" title="Boğa">♉</div>
+      <div class="z-icon" title="İkizler">♊</div>
+      <div class="z-icon" title="Yengeç">♋</div>
+      <div class="z-icon" title="Aslan">♌</div>
+      <div class="z-icon" title="Başak">♍</div>
+      <div class="z-icon" title="Terazi">♎</div>
+      <div class="z-icon" title="Akrep">♏</div>
+      <div class="z-icon" title="Yay">♐</div>
+      <div class="z-icon" title="Oğlak">♑</div>
+      <div class="z-icon" title="Kova">♒</div>
+      <div class="z-icon" title="Balık">♓</div>
+    </div>
+
+    <div class="features-wrap">
+      <div class="features-label">Neler sunuyoruz?</div>
+      <div class="features-grid">
+        <div class="feat-pill">🗺 Doğum Haritası</div>
+        <div class="feat-pill">🌙 Ay Fazı Takibi</div>
+        <div class="feat-pill">🪐 Gezegen Konumları</div>
+        <div class="feat-pill">💑 İlişki Uyumu</div>
+        <div class="feat-pill">📐 Açı Tablosu</div>
+        <div class="feat-pill">🏠 12 Ev Analizi</div>
+        <div class="feat-pill">⏳ Transit Haritalar</div>
+        <div class="feat-pill">📄 PDF Rapor</div>
+        <div class="feat-pill">📱 iOS & Android</div>
+        <div class="feat-pill">🔄 Çoklu Profil</div>
+        <div class="feat-pill ai">✨ AI Yorum</div>
+        <div class="feat-pill ai">💬 AI Soru-Cevap</div>
+      </div>
+    </div>
+
+    <div class="quote-wrap">
+      <div class="quote-text">"Yıldız bahanedir, yol senindir."</div>
+      <div class="quote-author">— Levent Tuncer, Astrolog & Eğitmen</div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── Right panel ── -->
+  <div class="panel-right">
+    <div class="card">
+      <div class="card-header">
+        <h2>✦ Evrenle Bağlan</h2>
+        <p>Kişisel burç haritana hoş geldin</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('login',this)">Giriş Yap</button>
+        <button class="tab" onclick="switchTab('register',this)">Kayıt Ol</button>
+      </div>
+
+      <form onsubmit="return false">
+
+        <!-- register only -->
+        <div class="field register-only" id="nameField">
+          <label>Ad Soyad</label>
+          <div class="input-wrap">
+            <span class="icon">✦</span>
+            <input type="text" placeholder="Kozmik adın..." />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>E-posta</label>
+          <div class="input-wrap">
+            <span class="icon">✉</span>
+            <input type="email" placeholder="adın@evren.com" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Şifre</label>
+          <div class="input-wrap">
+            <span class="icon">🔒</span>
+            <input type="password" placeholder="••••••••" />
+          </div>
+        </div>
+
+        <!-- register only -->
+        <div class="field register-only" id="birthField">
+          <label>Doğum Tarihi</label>
+          <div class="input-wrap">
+            <span class="icon">🎂</span>
+            <input type="date" />
+          </div>
+        </div>
+
+        <div class="sign-row" id="forgotRow">
+          <span></span>
+          <a href="#" class="forgot">Şifremi unuttum</a>
+        </div>
+
+        <button class="btn-submit" id="submitBtn">
+          <span class="btn-star">✦</span>
+          <span id="submitLabel">Giriş Yap</span>
+        </button>
+      </form>
+
+      <div class="sep">veya şununla devam et</div>
+
+      <div class="socials">
+        <button class="btn-social">
+          <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Google
+        </button>
+        <button class="btn-social">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </button>
+      </div>
+
+      <div class="footer-note" id="footerNote">
+        Hesabın yok mu? <a href="#" onclick="switchTab('register',null);return false">Kayıt ol</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="../js/log.js"></script>
+</body>
+</html>
