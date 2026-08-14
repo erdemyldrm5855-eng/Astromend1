@@ -1,90 +1,75 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const astro = require('./lib/astro');
+const db = require('./lib/db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'astromend-dev-secret-change-me';
+const STORY_LIFETIME_MS = 24 * 60 * 60 * 1000;
 
-// ── Basit dosya tabanlı "veritabanı" ──
-const DATA_DIR = path.join(__dirname, 'data');
-const USERS_FILE = path.join(DATA_DIR, 'users.json');
-const POSTS_FILE = path.join(DATA_DIR, 'posts.json');
-const STORIES_FILE = path.join(DATA_DIR, 'stories.json');
-const COMMENTS_FILE = path.join(DATA_DIR, 'comments.json');
-const NOTIFICATIONS_FILE = path.join(DATA_DIR, 'notifications.json');
-const POLLS_FILE = path.join(DATA_DIR, 'polls.json');
-const SYNASTRY_HISTORY_FILE = path.join(DATA_DIR, 'synastry-history.json');
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
-if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, '[]');
-if (!fs.existsSync(POSTS_FILE)) fs.writeFileSync(POSTS_FILE, '[]');
-if (!fs.existsSync(STORIES_FILE)) fs.writeFileSync(STORIES_FILE, '[]');
-if (!fs.existsSync(COMMENTS_FILE)) fs.writeFileSync(COMMENTS_FILE, '[]');
-if (!fs.existsSync(NOTIFICATIONS_FILE)) fs.writeFileSync(NOTIFICATIONS_FILE, '[]');
-if (!fs.existsSync(POLLS_FILE)) fs.writeFileSync(POLLS_FILE, '[]');
-if (!fs.existsSync(SYNASTRY_HISTORY_FILE)) fs.writeFileSync(SYNASTRY_HISTORY_FILE, '[]');
+// ── Satır → JS nesnesi dönüştürücüler (snake_case → camelCase) ──
+function rowToUser(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    passwordHash: row.password_hash,
+    birthDate: row.birth_date,
+    birthTime: row.birth_time,
+    birthPlace: row.birth_place,
+    bio: row.bio,
+    avatar: row.avatar,
+    createdAt: row.created_at
+  };
+}
+function rowToPost(row) {
+  return {
+    id: row.id,
+    authorId: row.author_id,
+    authorName: row.author_name,
+    authorAvatar: row.author_avatar,
+    authorSign: row.author_sign,
+    authorSignSymbol: row.author_sign_symbol,
+    text: row.text,
+    image: row.image,
+    createdAt: row.created_at
+  };
+}
+function rowToComment(row) {
+  return {
+    id: row.id,
+    postId: row.post_id,
+    authorId: row.author_id,
+    authorName: row.author_name,
+    authorAvatar: row.author_avatar,
+    authorSign: row.author_sign,
+    authorSignSymbol: row.author_sign_symbol,
+    text: row.text,
+    createdAt: row.created_at
+  };
+}
+function rowToStory(row) {
+  return {
+    id: row.id,
+    authorId: row.author_id,
+    authorName: row.author_name,
+    authorAvatar: row.author_avatar,
+    authorSign: row.author_sign,
+    authorSignSymbol: row.author_sign_symbol,
+    text: row.text,
+    image: row.image,
+    createdAt: row.created_at
+  };
+}
 
-function readUsers() {
-  return JSON.parse(fs.readFileSync(USERS_FILE, 'utf-8'));
-}
-function writeUsers(users) {
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-}
-function readPosts() {
-  return JSON.parse(fs.readFileSync(POSTS_FILE, 'utf-8'));
-}
-function writePosts(posts) {
-  fs.writeFileSync(POSTS_FILE, JSON.stringify(posts, null, 2));
-}
-function readStories() {
-  return JSON.parse(fs.readFileSync(STORIES_FILE, 'utf-8'));
-}
-function writeStories(stories) {
-  fs.writeFileSync(STORIES_FILE, JSON.stringify(stories, null, 2));
-}
-function readComments() {
-  return JSON.parse(fs.readFileSync(COMMENTS_FILE, 'utf-8'));
-}
-function writeComments(comments) {
-  fs.writeFileSync(COMMENTS_FILE, JSON.stringify(comments, null, 2));
-}
-function readNotifications() {
-  return JSON.parse(fs.readFileSync(NOTIFICATIONS_FILE, 'utf-8'));
-}
-function writeNotifications(list) {
-  fs.writeFileSync(NOTIFICATIONS_FILE, JSON.stringify(list, null, 2));
-}
-function readPolls() {
-  return JSON.parse(fs.readFileSync(POLLS_FILE, 'utf-8'));
-}
-function writePolls(polls) {
-  fs.writeFileSync(POLLS_FILE, JSON.stringify(polls, null, 2));
-}
-function todayKey() {
-  return new Date().toISOString().slice(0, 10);
-}
-function readSynastryHistory() {
-  return JSON.parse(fs.readFileSync(SYNASTRY_HISTORY_FILE, 'utf-8'));
-}
-function writeSynastryHistory(list) {
-  fs.writeFileSync(SYNASTRY_HISTORY_FILE, JSON.stringify(list, null, 2));
-}
-function ensureTodayPoll(polls) {
-  const key = todayKey();
-  let poll = polls.find(p => p.date === key);
-  if (!poll) {
-    const content = astro.getDailyPollContent(new Date());
-    poll = { date: key, question: content.question, options: content.options, votes: {} };
-    polls.push(poll);
-  }
-  return poll;
-}
-function getFullUser(id) {
-  return readUsers().find(u => u.id === id) || null;
+async function getFullUser(id) {
+  const { rows } = await db.query('SELECT * FROM users WHERE id = $1', [id]);
+  return rows[0] ? rowToUser(rows[0]) : null;
 }
 function userSign(user) {
   return user && user.birthDate ? astro.getZodiacSignFromDate(user.birthDate) : null;
@@ -93,18 +78,28 @@ function excerpt(text, n = 50) {
   if (!text) return '';
   return text.length > n ? text.slice(0, n).trim() + '…' : text;
 }
-function createNotification({ userId, type, fromUserId, fromUserName, postId, postExcerpt, commentText }) {
+async function createNotification({ userId, type, fromUserId, fromUserName, postId, postExcerpt, commentText }) {
   if (!userId || userId === fromUserId) return; // kendine bildirim yok
-  const list = readNotifications();
-  list.push({
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    userId, type, fromUserId, fromUserName, postId,
-    postExcerpt: postExcerpt || null,
-    commentText: commentText || null,
-    createdAt: new Date().toISOString(),
-    read: false
-  });
-  writeNotifications(list);
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  await db.query(
+    `INSERT INTO notifications (id, user_id, type, from_user_id, from_user_name, post_id, post_excerpt, comment_text, read)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,false)`,
+    [id, userId, type, fromUserId, fromUserName, postId || null, postExcerpt || null, commentText || null]
+  );
+}
+async function ensureTodayPoll() {
+  const key = new Date().toISOString().slice(0, 10);
+  const { rows } = await db.query('SELECT * FROM daily_polls WHERE poll_date = $1', [key]);
+  if (rows.length) return rows[0];
+
+  const content = astro.getDailyPollContent(new Date());
+  const { rows: inserted } = await db.query(
+    `INSERT INTO daily_polls (poll_date, question, options) VALUES ($1,$2,$3)
+     ON CONFLICT (poll_date) DO UPDATE SET poll_date = EXCLUDED.poll_date
+     RETURNING *`,
+    [key, content.question, JSON.stringify(content.options)]
+  );
+  return inserted[0];
 }
 
 app.use(express.json({ limit: '6mb' }));
@@ -149,7 +144,7 @@ function issueSession(res, user) {
 }
 
 // ── Kimlik doğrulama ──
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
   const { name, email, password, birthDate } = req.body || {};
 
   if (!name || !email || !password || !birthDate) {
@@ -159,44 +154,39 @@ app.post('/api/register', (req, res) => {
     return res.status(400).json({ ok: false, error: 'Şifre en az 6 karakter olmalı.' });
   }
 
-  const users = readUsers();
-  if (users.some(u => u.email.toLowerCase() === String(email).toLowerCase())) {
+  const normalizedEmail = String(email).trim().toLowerCase();
+  const { rows: existing } = await db.query('SELECT id FROM users WHERE email = $1', [normalizedEmail]);
+  if (existing.length) {
     return res.status(409).json({ ok: false, error: 'Bu e-posta ile zaten bir hesap var.' });
   }
 
-  const user = {
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
-    name: String(name).trim(),
-    email: String(email).trim().toLowerCase(),
-    passwordHash: bcrypt.hashSync(password, 10),
-    birthDate: birthDate || null,
-    birthTime: null,
-    birthPlace: null,
-    bio: null,
-    avatar: null,
-    createdAt: new Date().toISOString()
-  };
-  users.push(user);
-  writeUsers(users);
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const trimmedName = String(name).trim();
+  const passwordHash = bcrypt.hashSync(password, 10);
 
-  issueSession(res, user);
-  res.json({ ok: true, user: { name: user.name, email: user.email } });
+  await db.query(
+    `INSERT INTO users (id, name, email, password_hash, birth_date) VALUES ($1,$2,$3,$4,$5)`,
+    [id, trimmedName, normalizedEmail, passwordHash, birthDate]
+  );
+
+  issueSession(res, { id, name: trimmedName, email: normalizedEmail });
+  res.json({ ok: true, user: { name: trimmedName, email: normalizedEmail } });
 });
 
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
   const { email, password } = req.body || {};
   if (!email || !password) {
     return res.status(400).json({ ok: false, error: 'E-posta ve şifre gerekli.' });
   }
 
-  const users = readUsers();
-  const user = users.find(u => u.email.toLowerCase() === String(email).trim().toLowerCase());
-  if (!user || !bcrypt.compareSync(password, user.passwordHash)) {
+  const { rows } = await db.query('SELECT * FROM users WHERE email = $1', [String(email).trim().toLowerCase()]);
+  const row = rows[0];
+  if (!row || !bcrypt.compareSync(password, row.password_hash)) {
     return res.status(401).json({ ok: false, error: 'E-posta veya şifre hatalı.' });
   }
 
-  issueSession(res, user);
-  res.json({ ok: true, user: { name: user.name, email: user.email } });
+  issueSession(res, { id: row.id, name: row.name, email: row.email });
+  res.json({ ok: true, user: { name: row.name, email: row.email } });
 });
 
 app.post('/api/logout', (req, res) => {
@@ -204,9 +194,9 @@ app.post('/api/logout', (req, res) => {
   res.json({ ok: true });
 });
 
-app.get('/api/me', (req, res) => {
+app.get('/api/me', async (req, res) => {
   if (!req.user) return res.status(401).json({ ok: false });
-  const user = getFullUser(req.user.id);
+  const user = await getFullUser(req.user.id);
   if (!user) return res.status(401).json({ ok: false });
 
   const sign = userSign(user);
@@ -228,41 +218,46 @@ app.get('/api/me', (req, res) => {
 });
 
 // ── Profil ──
-app.put('/api/profile', requireAuth, (req, res) => {
+app.put('/api/profile', requireAuth, async (req, res) => {
   const { name, birthDate, birthTime, birthPlace, bio, avatar } = req.body || {};
-  const users = readUsers();
-  const idx = users.findIndex(u => u.id === req.user.id);
-  if (idx === -1) return res.status(401).json({ ok: false });
 
-  if (name && String(name).trim()) users[idx].name = String(name).trim();
-  if (birthDate) users[idx].birthDate = birthDate;
+  if (avatar !== undefined && avatar && !isValidImageDataUrl(avatar)) {
+    return res.status(400).json({ ok: false, error: 'Geçersiz ya da çok büyük bir profil fotoğrafı (maks. ~3MB, png/jpg/gif/webp).' });
+  }
+
+  const sets = [];
+  const values = [];
+  let i = 1;
+
+  if (name && String(name).trim()) { sets.push(`name = $${i++}`); values.push(String(name).trim()); }
+  if (birthDate) { sets.push(`birth_date = $${i++}`); values.push(birthDate); }
   if (birthTime !== undefined) {
-    users[idx].birthTime = birthTime && /^\d{2}:\d{2}$/.test(birthTime) ? birthTime : null;
+    sets.push(`birth_time = $${i++}`);
+    values.push(birthTime && /^\d{2}:\d{2}$/.test(birthTime) ? birthTime : null);
   }
   if (birthPlace !== undefined) {
-    users[idx].birthPlace = birthPlace ? String(birthPlace).trim().slice(0, 80) : null;
+    sets.push(`birth_place = $${i++}`);
+    values.push(birthPlace ? String(birthPlace).trim().slice(0, 80) : null);
   }
   if (bio !== undefined) {
-    users[idx].bio = bio ? String(bio).trim().slice(0, 280) : null;
+    sets.push(`bio = $${i++}`);
+    values.push(bio ? String(bio).trim().slice(0, 280) : null);
   }
-
   if (avatar !== undefined) {
-    if (!avatar) {
-      users[idx].avatar = null;
-    } else if (isValidImageDataUrl(avatar)) {
-      users[idx].avatar = avatar;
-    } else {
-      return res.status(400).json({ ok: false, error: 'Geçersiz ya da çok büyük bir profil fotoğrafı (maks. ~3MB, png/jpg/gif/webp).' });
-    }
+    sets.push(`avatar = $${i++}`);
+    values.push(avatar || null);
   }
 
-  writeUsers(users);
+  if (!sets.length) return res.json({ ok: true });
+
+  values.push(req.user.id);
+  await db.query(`UPDATE users SET ${sets.join(', ')} WHERE id = $${i}`, values);
   res.json({ ok: true });
 });
 
 // ── Doğum haritası (natal) ──
-app.get('/api/chart', requireAuth, (req, res) => {
-  const user = getFullUser(req.user.id);
+app.get('/api/chart', requireAuth, async (req, res) => {
+  const user = await getFullUser(req.user.id);
   if (!user || !user.birthDate) {
     return res.status(400).json({ ok: false, error: 'Doğum tarihin eksik. Önce Profilim sayfasından ekle.' });
   }
@@ -279,8 +274,8 @@ app.get('/api/chart', requireAuth, (req, res) => {
 });
 
 // ── Transit (bugünün gökyüzü) ──
-app.get('/api/transit', requireAuth, (req, res) => {
-  const user = getFullUser(req.user.id);
+app.get('/api/transit', requireAuth, async (req, res) => {
+  const user = await getFullUser(req.user.id);
   const natal = user && user.birthDate ? astro.getNatalChart(user.birthDate, user.birthTime) : null;
   const transit = astro.getTransit();
   const moonPhase = astro.getMoonPhase();
@@ -299,9 +294,9 @@ app.get('/api/transit', requireAuth, (req, res) => {
 });
 
 // ── Sinastri (ilişki uyumu) ──
-app.post('/api/synastry', requireAuth, (req, res) => {
+app.post('/api/synastry', requireAuth, async (req, res) => {
   const { partnerBirthDate, partnerId } = req.body || {};
-  const user = getFullUser(req.user.id);
+  const user = await getFullUser(req.user.id);
   if (!user || !user.birthDate) {
     return res.status(400).json({ ok: false, error: 'Önce kendi doğum tarihini Profilim sayfasından ekle.' });
   }
@@ -309,7 +304,7 @@ app.post('/api/synastry', requireAuth, (req, res) => {
   let partnerDate = partnerBirthDate;
   let partnerName = 'Partnerin';
   if (partnerId) {
-    const partner = readUsers().find(u => u.id === partnerId);
+    const partner = await getFullUser(partnerId);
     if (!partner) return res.status(404).json({ ok: false, error: 'Kullanıcı bulunamadı.' });
     if (!partner.birthDate) return res.status(400).json({ ok: false, error: 'Bu kullanıcı henüz doğum tarihini eklememiş.' });
     partnerDate = partner.birthDate;
@@ -323,36 +318,42 @@ app.post('/api/synastry', requireAuth, (req, res) => {
   const theirSign = astro.getZodiacSignFromDate(partnerDate);
   const result = astro.synastry(mySign.name, theirSign.name);
 
-  const history = readSynastryHistory();
-  history.push({
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    userId: req.user.id,
-    partnerName,
-    sign1: result.sign1,
-    sign2: result.sign2,
-    score: result.score,
-    text: result.text,
-    createdAt: new Date().toISOString()
-  });
-  writeSynastryHistory(history);
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  await db.query(
+    `INSERT INTO synastry_history (id, user_id, partner_name, sign1, sign2, score, result_text)
+     VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+    [id, req.user.id, partnerName, result.sign1, result.sign2, result.score, result.text]
+  );
 
   res.json({ ok: true, partnerName, result });
 });
 
 // ── Sinastri Geçmişi ──
-app.get('/api/synastry-history', requireAuth, (req, res) => {
-  const list = readSynastryHistory()
-    .filter(h => h.userId === req.user.id)
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  res.json({ ok: true, history: list });
+app.get('/api/synastry-history', requireAuth, async (req, res) => {
+  const { rows } = await db.query(
+    `SELECT * FROM synastry_history WHERE user_id = $1 ORDER BY created_at DESC`,
+    [req.user.id]
+  );
+  res.json({
+    ok: true,
+    history: rows.map(r => ({
+      id: r.id,
+      partnerName: r.partner_name,
+      sign1: r.sign1,
+      sign2: r.sign2,
+      score: r.score,
+      text: r.result_text,
+      createdAt: r.created_at
+    }))
+  });
 });
 
-app.delete('/api/synastry-history/:id', requireAuth, (req, res) => {
-  const list = readSynastryHistory();
-  const idx = list.findIndex(h => h.id === req.params.id && h.userId === req.user.id);
-  if (idx === -1) return res.status(404).json({ ok: false });
-  list.splice(idx, 1);
-  writeSynastryHistory(list);
+app.delete('/api/synastry-history/:id', requireAuth, async (req, res) => {
+  const { rowCount } = await db.query(
+    `DELETE FROM synastry_history WHERE id = $1 AND user_id = $2`,
+    [req.params.id, req.user.id]
+  );
+  if (!rowCount) return res.status(404).json({ ok: false });
   res.json({ ok: true });
 });
 
@@ -366,8 +367,8 @@ app.get('/api/all-signs', requireAuth, (req, res) => {
 });
 
 // ── Geçmiş Haritalarım (son 7 günün transiti, kendi burcuna göre yorumlanmış) ──
-app.get('/api/chart-history', requireAuth, (req, res) => {
-  const user = getFullUser(req.user.id);
+app.get('/api/chart-history', requireAuth, async (req, res) => {
+  const user = await getFullUser(req.user.id);
   if (!user || !user.birthDate) {
     return res.status(400).json({ ok: false, error: 'Doğum tarihin eksik. Önce Profilim sayfasından ekle.' });
   }
@@ -385,8 +386,8 @@ app.get('/api/chart-history', requireAuth, (req, res) => {
 });
 
 // ── Solar Return ──
-app.get('/api/solar-return', requireAuth, (req, res) => {
-  const user = getFullUser(req.user.id);
+app.get('/api/solar-return', requireAuth, async (req, res) => {
+  const user = await getFullUser(req.user.id);
   if (!user || !user.birthDate) {
     return res.status(400).json({ ok: false, error: 'Doğum tarihin eksik. Önce Profilim sayfasından ekle.' });
   }
@@ -394,12 +395,14 @@ app.get('/api/solar-return', requireAuth, (req, res) => {
 });
 
 // ── Topluluk (isim/burca göre aranabilir) ──
-app.get('/api/community', requireAuth, (req, res) => {
+app.get('/api/community', requireAuth, async (req, res) => {
   const q = (req.query.q || '').toString().trim().toLocaleLowerCase('tr');
-  const users = readUsers()
-    .filter(u => u.birthDate)
+  const { rows } = await db.query(
+    `SELECT id, name, bio, avatar, birth_date FROM users WHERE birth_date IS NOT NULL`
+  );
+  const users = rows
     .map(u => {
-      const sign = astro.getZodiacSignFromDate(u.birthDate);
+      const sign = astro.getZodiacSignFromDate(u.birth_date);
       return { id: u.id, name: u.name, bio: u.bio || null, avatar: u.avatar || null, sign: sign ? sign.name : null, signSymbol: sign ? sign.symbol : null };
     })
     .filter(u => {
@@ -412,37 +415,33 @@ app.get('/api/community', requireAuth, (req, res) => {
 });
 
 // ── AI Asistan (kural tabanlı; gerçek zamanlı bir LLM değil) ──
-app.post('/api/ai-assistant', requireAuth, (req, res) => {
+app.post('/api/ai-assistant', requireAuth, async (req, res) => {
   const { message } = req.body || {};
-  const user = getFullUser(req.user.id);
+  const user = await getFullUser(req.user.id);
   const sign = userSign(user);
   const reply = astro.answerAssistant(message, sign ? sign.name : null, user ? user.name : null);
   res.json({ ok: true, reply });
 });
 
 // ── Hikayeler (Instagram benzeri, 24 saat görünür) ──
-const STORY_LIFETIME_MS = 24 * 60 * 60 * 1000;
-
-app.get('/api/stories', requireAuth, (req, res) => {
-  const cutoff = Date.now() - STORY_LIFETIME_MS;
-  const active = readStories().filter(s => new Date(s.createdAt).getTime() >= cutoff);
-
-  const latestByAuthor = new Map();
-  for (const s of active) {
-    const existing = latestByAuthor.get(s.authorId);
-    if (!existing || new Date(s.createdAt) > new Date(existing.createdAt)) {
-      latestByAuthor.set(s.authorId, s);
-    }
-  }
-
-  const stories = Array.from(latestByAuthor.values())
+app.get('/api/stories', requireAuth, async (req, res) => {
+  const cutoffIso = new Date(Date.now() - STORY_LIFETIME_MS).toISOString();
+  const { rows } = await db.query(
+    `SELECT DISTINCT ON (author_id) *
+     FROM stories
+     WHERE created_at >= $1
+     ORDER BY author_id, created_at DESC`,
+    [cutoffIso]
+  );
+  const stories = rows
+    .map(rowToStory)
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .map(s => ({ ...s, isMine: s.authorId === req.user.id }));
 
   res.json({ ok: true, stories });
 });
 
-app.post('/api/stories', requireAuth, (req, res) => {
+app.post('/api/stories', requireAuth, async (req, res) => {
   const { text, image } = req.body || {};
   const trimmedText = text ? String(text).trim().slice(0, 200) : '';
   const hasImage = !!image;
@@ -454,57 +453,70 @@ app.post('/api/stories', requireAuth, (req, res) => {
     return res.status(400).json({ ok: false, error: 'Hikaye boş olamaz — metin ya da fotoğraf ekle.' });
   }
 
-  const user = getFullUser(req.user.id);
+  const user = await getFullUser(req.user.id);
   const sign = userSign(user);
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
-  const stories = readStories();
-  const story = {
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    authorId: req.user.id,
-    authorName: user.name,
-    authorAvatar: user.avatar || null,
-    authorSign: sign ? sign.name : null,
-    authorSignSymbol: sign ? sign.symbol : null,
-    text: trimmedText,
-    image: hasImage ? image : null,
-    createdAt: new Date().toISOString()
-  };
-  stories.push(story);
-  writeStories(stories);
-  res.json({ ok: true, story: { ...story, isMine: true } });
+  const { rows } = await db.query(
+    `INSERT INTO stories (id, author_id, author_name, author_avatar, author_sign, author_sign_symbol, text, image)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
+    [id, req.user.id, user.name, user.avatar || null, sign ? sign.name : null, sign ? sign.symbol : null, trimmedText, hasImage ? image : null]
+  );
+
+  res.json({ ok: true, story: { ...rowToStory(rows[0]), isMine: true } });
 });
 
-app.delete('/api/stories/:id', requireAuth, (req, res) => {
-  const stories = readStories();
-  const idx = stories.findIndex(s => s.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ ok: false });
-  if (stories[idx].authorId !== req.user.id) {
+app.delete('/api/stories/:id', requireAuth, async (req, res) => {
+  const { rows } = await db.query('SELECT author_id FROM stories WHERE id = $1', [req.params.id]);
+  if (!rows.length) return res.status(404).json({ ok: false });
+  if (rows[0].author_id !== req.user.id) {
     return res.status(403).json({ ok: false, error: 'Sadece kendi hikayeni silebilirsin.' });
   }
-  stories.splice(idx, 1);
-  writeStories(stories);
+  await db.query('DELETE FROM stories WHERE id = $1', [req.params.id]);
   res.json({ ok: true });
 });
 
 // ── Gönderiler (Twitter benzeri akış) ──
-app.get('/api/posts', requireAuth, (req, res) => {
-  let posts = readPosts().slice().reverse();
-  if (req.query.mine === '1') posts = posts.filter(p => p.authorId === req.user.id);
+app.get('/api/posts', requireAuth, async (req, res) => {
+  const mineOnly = req.query.mine === '1';
+  const { rows } = await db.query(
+    mineOnly
+      ? `SELECT * FROM posts WHERE author_id = $1 ORDER BY created_at DESC`
+      : `SELECT * FROM posts ORDER BY created_at DESC`,
+    mineOnly ? [req.user.id] : []
+  );
 
-  const comments = readComments();
-  res.json({
-    ok: true,
-    posts: posts.map(p => ({
+  if (!rows.length) return res.json({ ok: true, posts: [] });
+
+  const postIds = rows.map(r => r.id);
+  const [likesRes, commentsRes] = await Promise.all([
+    db.query(`SELECT post_id, user_id FROM post_likes WHERE post_id = ANY($1)`, [postIds]),
+    db.query(`SELECT post_id, COUNT(*)::int AS cnt FROM comments WHERE post_id = ANY($1) GROUP BY post_id`, [postIds])
+  ]);
+
+  const likesByPost = new Map();
+  for (const l of likesRes.rows) {
+    if (!likesByPost.has(l.post_id)) likesByPost.set(l.post_id, new Set());
+    likesByPost.get(l.post_id).add(l.user_id);
+  }
+  const commentCountByPost = new Map(commentsRes.rows.map(c => [c.post_id, c.cnt]));
+
+  const posts = rows.map(row => {
+    const p = rowToPost(row);
+    const likeSet = likesByPost.get(p.id) || new Set();
+    return {
       ...p,
       isMine: p.authorId === req.user.id,
-      likedByMe: p.likes.includes(req.user.id),
-      likeCount: p.likes.length,
-      commentCount: comments.filter(c => c.postId === p.id).length
-    }))
+      likedByMe: likeSet.has(req.user.id),
+      likeCount: likeSet.size,
+      commentCount: commentCountByPost.get(p.id) || 0
+    };
   });
+
+  res.json({ ok: true, posts });
 });
 
-app.post('/api/posts', requireAuth, (req, res) => {
+app.post('/api/posts', requireAuth, async (req, res) => {
   const { text, image } = req.body || {};
   const trimmedText = text ? String(text).trim().slice(0, 500) : '';
   const hasImage = !!image;
@@ -516,42 +528,42 @@ app.post('/api/posts', requireAuth, (req, res) => {
     return res.status(400).json({ ok: false, error: 'Boş gönderi paylaşamazsın — metin ya da fotoğraf ekle.' });
   }
 
-  const user = getFullUser(req.user.id);
+  const user = await getFullUser(req.user.id);
   const sign = userSign(user);
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
-  const posts = readPosts();
-  const post = {
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    authorId: req.user.id,
-    authorName: user.name,
-    authorAvatar: user.avatar || null,
-    authorSign: sign ? sign.name : null,
-    authorSignSymbol: sign ? sign.symbol : null,
-    text: trimmedText,
-    image: hasImage ? image : null,
-    createdAt: new Date().toISOString(),
-    likes: []
-  };
-  posts.push(post);
-  writePosts(posts);
-  res.json({ ok: true, post: { ...post, isMine: true, likedByMe: false, likeCount: 0 } });
+  const { rows } = await db.query(
+    `INSERT INTO posts (id, author_id, author_name, author_avatar, author_sign, author_sign_symbol, text, image)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
+    [id, req.user.id, user.name, user.avatar || null, sign ? sign.name : null, sign ? sign.symbol : null, trimmedText, hasImage ? image : null]
+  );
+
+  res.json({ ok: true, post: { ...rowToPost(rows[0]), isMine: true, likedByMe: false, likeCount: 0, commentCount: 0 } });
 });
 
-app.post('/api/posts/:id/like', requireAuth, (req, res) => {
-  const posts = readPosts();
-  const post = posts.find(p => p.id === req.params.id);
-  if (!post) return res.status(404).json({ ok: false });
+app.post('/api/posts/:id/like', requireAuth, async (req, res) => {
+  const { rows: postRows } = await db.query('SELECT * FROM posts WHERE id = $1', [req.params.id]);
+  if (!postRows.length) return res.status(404).json({ ok: false });
+  const post = postRows[0];
 
-  const idx = post.likes.indexOf(req.user.id);
-  const isLiking = idx === -1;
-  if (isLiking) post.likes.push(req.user.id);
-  else post.likes.splice(idx, 1);
-  writePosts(posts);
+  const { rows: existingLike } = await db.query(
+    'SELECT 1 FROM post_likes WHERE post_id = $1 AND user_id = $2', [req.params.id, req.user.id]
+  );
+  const isLiking = existingLike.length === 0;
 
   if (isLiking) {
-    const user = getFullUser(req.user.id);
-    createNotification({
-      userId: post.authorId,
+    await db.query('INSERT INTO post_likes (post_id, user_id) VALUES ($1,$2)', [req.params.id, req.user.id]);
+  } else {
+    await db.query('DELETE FROM post_likes WHERE post_id = $1 AND user_id = $2', [req.params.id, req.user.id]);
+  }
+
+  const { rows: countRows } = await db.query('SELECT COUNT(*)::int AS cnt FROM post_likes WHERE post_id = $1', [req.params.id]);
+  const likeCount = countRows[0].cnt;
+
+  if (isLiking) {
+    const user = await getFullUser(req.user.id);
+    await createNotification({
+      userId: post.author_id,
       type: 'like',
       fromUserId: req.user.id,
       fromUserName: user.name,
@@ -560,108 +572,105 @@ app.post('/api/posts/:id/like', requireAuth, (req, res) => {
     });
   }
 
-  res.json({ ok: true, likedByMe: isLiking, likeCount: post.likes.length });
+  res.json({ ok: true, likedByMe: isLiking, likeCount });
 });
 
-app.delete('/api/posts/:id', requireAuth, (req, res) => {
-  const posts = readPosts();
-  const idx = posts.findIndex(p => p.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ ok: false });
-  if (posts[idx].authorId !== req.user.id) {
+app.delete('/api/posts/:id', requireAuth, async (req, res) => {
+  const { rows } = await db.query('SELECT author_id FROM posts WHERE id = $1', [req.params.id]);
+  if (!rows.length) return res.status(404).json({ ok: false });
+  if (rows[0].author_id !== req.user.id) {
     return res.status(403).json({ ok: false, error: 'Sadece kendi gönderini silebilirsin.' });
   }
-  posts.splice(idx, 1);
-  writePosts(posts);
-
-  const comments = readComments().filter(c => c.postId !== req.params.id);
-  writeComments(comments);
-
+  await db.query('DELETE FROM posts WHERE id = $1', [req.params.id]); // ilişkili beğeni/yorumlar CASCADE ile silinir
   res.json({ ok: true });
 });
 
 // ── Gönderi yanıtları (yorumlar) ──
-app.get('/api/posts/:id/comments', requireAuth, (req, res) => {
-  const comments = readComments().filter(c => c.postId === req.params.id);
-  res.json({ ok: true, comments });
+app.get('/api/posts/:id/comments', requireAuth, async (req, res) => {
+  const { rows } = await db.query(
+    'SELECT * FROM comments WHERE post_id = $1 ORDER BY created_at ASC', [req.params.id]
+  );
+  res.json({ ok: true, comments: rows.map(rowToComment) });
 });
 
-app.post('/api/posts/:id/comments', requireAuth, (req, res) => {
+app.post('/api/posts/:id/comments', requireAuth, async (req, res) => {
   const { text } = req.body || {};
   if (!text || !String(text).trim()) {
     return res.status(400).json({ ok: false, error: 'Yanıt boş olamaz.' });
   }
 
-  const post = readPosts().find(p => p.id === req.params.id);
-  if (!post) return res.status(404).json({ ok: false });
+  const { rows: postRows } = await db.query('SELECT * FROM posts WHERE id = $1', [req.params.id]);
+  if (!postRows.length) return res.status(404).json({ ok: false });
+  const post = postRows[0];
 
-  const user = getFullUser(req.user.id);
+  const user = await getFullUser(req.user.id);
   const sign = userSign(user);
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const trimmedText = String(text).trim().slice(0, 300);
 
-  const comments = readComments();
-  const comment = {
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    postId: post.id,
-    authorId: req.user.id,
-    authorName: user.name,
-    authorAvatar: user.avatar || null,
-    authorSign: sign ? sign.name : null,
-    authorSignSymbol: sign ? sign.symbol : null,
-    text: String(text).trim().slice(0, 300),
-    createdAt: new Date().toISOString()
-  };
-  comments.push(comment);
-  writeComments(comments);
+  const { rows } = await db.query(
+    `INSERT INTO comments (id, post_id, author_id, author_name, author_avatar, author_sign, author_sign_symbol, text)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
+    [id, post.id, req.user.id, user.name, user.avatar || null, sign ? sign.name : null, sign ? sign.symbol : null, trimmedText]
+  );
 
-  createNotification({
-    userId: post.authorId,
+  await createNotification({
+    userId: post.author_id,
     type: 'comment',
     fromUserId: req.user.id,
     fromUserName: user.name,
     postId: post.id,
     postExcerpt: excerpt(post.text),
-    commentText: excerpt(comment.text, 80)
+    commentText: excerpt(trimmedText, 80)
   });
 
-  res.json({ ok: true, comment });
+  res.json({ ok: true, comment: rowToComment(rows[0]) });
 });
 
 // ── Bildirimler ──
-app.get('/api/notifications', requireAuth, (req, res) => {
-  const list = readNotifications()
-    .filter(n => n.userId === req.user.id)
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 50);
-  const unreadCount = list.filter(n => !n.read).length;
-  res.json({ ok: true, notifications: list, unreadCount });
+app.get('/api/notifications', requireAuth, async (req, res) => {
+  const { rows } = await db.query(
+    `SELECT * FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50`,
+    [req.user.id]
+  );
+  const notifications = rows.map(r => ({
+    id: r.id,
+    userId: r.user_id,
+    type: r.type,
+    fromUserId: r.from_user_id,
+    fromUserName: r.from_user_name,
+    postId: r.post_id,
+    postExcerpt: r.post_excerpt,
+    commentText: r.comment_text,
+    createdAt: r.created_at,
+    read: r.read
+  }));
+  const unreadCount = notifications.filter(n => !n.read).length;
+  res.json({ ok: true, notifications, unreadCount });
 });
 
-app.post('/api/notifications/read-all', requireAuth, (req, res) => {
-  const list = readNotifications();
-  let changed = false;
-  list.forEach(n => {
-    if (n.userId === req.user.id && !n.read) { n.read = true; changed = true; }
-  });
-  if (changed) writeNotifications(list);
+app.post('/api/notifications/read-all', requireAuth, async (req, res) => {
+  await db.query(`UPDATE notifications SET read = true WHERE user_id = $1 AND read = false`, [req.user.id]);
   res.json({ ok: true });
 });
 
 // ── Günün Anketi (Ay burcu/evresine göre her gün otomatik oluşur) ──
-app.get('/api/daily-poll', requireAuth, (req, res) => {
-  const polls = readPolls();
-  const poll = ensureTodayPoll(polls);
-  writePolls(polls);
+app.get('/api/daily-poll', requireAuth, async (req, res) => {
+  const poll = await ensureTodayPoll();
+  const { rows: voteRows } = await db.query('SELECT user_id, option_key FROM poll_votes WHERE poll_date = $1', [poll.poll_date]);
 
   const counts = {};
   poll.options.forEach(o => { counts[o.key] = 0; });
-  Object.values(poll.votes).forEach(key => { if (counts[key] !== undefined) counts[key]++; });
-  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  voteRows.forEach(v => { if (counts[v.option_key] !== undefined) counts[v.option_key]++; });
+  const total = voteRows.length;
+  const myVoteRow = voteRows.find(v => v.user_id === req.user.id);
 
   res.json({
     ok: true,
-    date: poll.date,
+    date: poll.poll_date,
     question: poll.question,
     total,
-    myVote: poll.votes[req.user.id] || null,
+    myVote: myVoteRow ? myVoteRow.option_key : null,
     options: poll.options.map(o => ({
       ...o,
       count: counts[o.key],
@@ -670,16 +679,19 @@ app.get('/api/daily-poll', requireAuth, (req, res) => {
   });
 });
 
-app.post('/api/daily-poll/vote', requireAuth, (req, res) => {
+app.post('/api/daily-poll/vote', requireAuth, async (req, res) => {
   const { option } = req.body || {};
-  const polls = readPolls();
-  const poll = ensureTodayPoll(polls);
+  const poll = await ensureTodayPoll();
 
   if (!poll.options.some(o => o.key === option)) {
     return res.status(400).json({ ok: false, error: 'Geçersiz seçenek.' });
   }
-  poll.votes[req.user.id] = option;
-  writePolls(polls);
+
+  await db.query(
+    `INSERT INTO poll_votes (poll_date, user_id, option_key) VALUES ($1,$2,$3)
+     ON CONFLICT (poll_date, user_id) DO UPDATE SET option_key = EXCLUDED.option_key`,
+    [poll.poll_date, req.user.id, option]
+  );
   res.json({ ok: true });
 });
 
@@ -689,13 +701,19 @@ app.get('/html/home.html', (req, res, next) => {
   next();
 });
 
-// ── Statik dosyalar (sadece public klasörler — data/ ve server.js dışarı açılmaz) ──
+// ── Statik dosyalar (sadece public klasörler — .env ve server.js dışarı açılmaz) ──
 app.use('/html', express.static(path.join(__dirname, 'html')));
 app.use('/css', express.static(path.join(__dirname, 'css')));
 app.use('/js', express.static(path.join(__dirname, 'js')));
 
 app.get('/', (req, res) => {
   res.redirect(req.user ? '/html/home.html' : '/html/log.html');
+});
+
+// ── Beklenmeyen hatalar için JSON yanıt ──
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ ok: false, error: 'Sunucu hatası.' });
 });
 
 app.listen(PORT, () => {
